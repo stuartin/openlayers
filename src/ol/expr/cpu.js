@@ -124,11 +124,6 @@ function compileExpression(expression, context) {
     case Ops.GeometryType: {
       return (context) => context.geometryType;
     }
-    case Ops.Concat: {
-      const args = expression.args.map((e) => compileExpression(e, context));
-      return (context) =>
-        ''.concat(...args.map((arg) => arg(context).toString()));
-    }
     case Ops.Resolution: {
       return (context) => context.resolution;
     }
@@ -164,6 +159,7 @@ function compileExpression(expression, context) {
     case Ops.Sqrt: {
       return compileNumericExpression(expression, context);
     }
+    case Ops.Concat:
     case Ops.Regex: {
       return compileStringExpression(expression, context);
     }
@@ -393,6 +389,10 @@ function compileStringExpression(expression, context) {
     args[i] = compileExpression(expression.args[i], context);
   }
   switch (op) {
+    case Ops.Concat: {
+      return (context) =>
+        ''.concat(...args.map((arg) => arg(context).toString()));
+    }
     case Ops.Regex: {
       return (context) => {
         const value = args[0](context);

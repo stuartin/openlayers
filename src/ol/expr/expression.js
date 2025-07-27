@@ -123,6 +123,7 @@ import {toSize} from '../size.js';
  *     Language Specification. If the input is a color, it is converted to a string of the form "rgba(r,g,b,a)". (Canvas only)
  *
  * * String operators:
+ *   * `['concat', ...valueN]` `concat` any number of strings together into a single string
  *   * `['regex', value, regex, index]` performs a regex match against the `value` and returns the match at `index`.
  *     `\` characters must be escaped, for example: ['regex', '123', '^\\d+', 0] > '123'
  *
