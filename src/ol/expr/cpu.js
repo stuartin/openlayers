@@ -164,6 +164,9 @@ function compileExpression(expression, context) {
     case Ops.Sqrt: {
       return compileNumericExpression(expression, context);
     }
+    case Ops.Regex: {
+      return compileStringExpression(expression, context);
+    }
     case Ops.Case: {
       return compileCaseExpression(expression, context);
     }
@@ -372,6 +375,37 @@ function compileLogicalExpression(expression, context) {
     }
     default: {
       throw new Error(`Unsupported logical operator ${op}`);
+    }
+  }
+}
+
+/**
+ * @param {import('./expression.js').CallExpression} expression The call expression.
+ * @param {import('./expression.js').ParsingContext} context The parsing context.
+ * @return {StringEvaluator} The evaluator function.
+ */
+function compileStringExpression(expression, context) {
+  const op = expression.operator;
+  const length = expression.args.length;
+
+  const args = new Array(length);
+  for (let i = 0; i < length; ++i) {
+    args[i] = compileExpression(expression.args[i], context);
+  }
+  switch (op) {
+    case Ops.Regex: {
+      return (context) => {
+        const value = args[0](context);
+        const regex = new RegExp(args[1](context));
+        const index = args[2](context);
+
+        const result = value.match(regex);
+        return result ? result[index] : '';
+      };
+    }
+
+    default: {
+      throw new Error(`Unsupported string operator ${op}`);
     }
   }
 }
