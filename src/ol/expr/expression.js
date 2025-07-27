@@ -428,7 +428,6 @@ export const Ops = {
   Band: 'band',
   Palette: 'palette',
   ToString: 'to-string',
-  ToNumber: 'to-number',
   Has: 'has',
   Regex: 'regex',
 };
@@ -603,10 +602,6 @@ const parsers = {
   [Ops.ToString]: createCallExpressionParser(
     hasArgsCount(1, 1),
     withArgsOfType(BooleanType | NumberType | StringType | ColorType),
-  ),
-  [Ops.ToNumber]: createCallExpressionParser(
-    hasArgsCount(1, 1),
-    withArgsOfType(BooleanType | NumberType | StringType),
   ),
   [Ops.Regex]: createCallExpressionParser(hasArgsCount(3, 3), withRegexArgs),
 };
