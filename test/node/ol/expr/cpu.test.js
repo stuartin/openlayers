@@ -808,6 +808,35 @@ describe('ol/expr/cpu.js', () => {
         expected: false,
       },
       {
+        name: 'at (valid)',
+        type: StringType,
+        expression: ['at', 0, ['one', 'two', 'three']],
+        expected: 'one',
+      },
+      {
+        name: 'at (get in array)',
+        context: {
+          properties: {
+            text: 'needle',
+          },
+        },
+        type: StringType,
+        expression: ['at', 1, ['one', ['get', 'text'], 'three']],
+        expected: 'needle',
+      },
+      {
+        name: 'length (array)',
+        type: NumberType,
+        expression: ['length', ['one', 'two', 'three']],
+        expected: 3,
+      },
+      {
+        name: 'length (string)',
+        type: NumberType,
+        expression: ['length', 'hello'],
+        expected: 5,
+      },
+      {
         name: 'regex (valid)',
         type: StringType,
         expression: ['regex', 'hello world', '^hello'],

@@ -128,6 +128,10 @@ import {toSize} from '../size.js';
  *     `\` characters in regex must be escaped, for example: `['regex', '123', '^\\d+']` would result in `['123']`,
  *     if no result is gound, an empty array is returned.
  *
+ * * Lookup operators:
+ *   * `['length', [...]]` or `['length', 'string']` returns the length of a given array or string
+ *   * `['at', index, [...]]` Returns the value at the specified index in an array. Will return `undefined` if nothing is found
+ *
  * Values can either be literals or another operator, as they will be evaluated recursively.
  * Literal values can be of the following types:
  * * `boolean`
@@ -431,6 +435,8 @@ export const Ops = {
   ToString: 'to-string',
   Has: 'has',
   Regex: 'regex',
+  At: 'at',
+  Length: 'length',
 };
 
 /**
@@ -604,6 +610,8 @@ const parsers = {
     hasArgsCount(1, 1),
     withArgsOfType(BooleanType | NumberType | StringType | ColorType),
   ),
+  [Ops.At]: createCallExpressionParser(hasArgsCount(2, 2), withAtArgs),
+  [Ops.Length]: createCallExpressionParser(hasArgsCount(1, 1), withLengthArgs),
   [Ops.Regex]: createCallExpressionParser(
     hasArgsCount(2, 2),
     withArgsOfType(StringType),
@@ -954,6 +962,79 @@ function withInArgs(encoded, returnType, context) {
 
   const needle = parse(encoded[1], needleType, context);
   return [needle, ...args];
+}
+
+/**
+ * @type {ArgValidator}
+ */
+function withAtArgs(encoded, returnType, context) {
+  const idx = encoded[1];
+  const arr = encoded[2];
+
+  if (typeof idx !== 'number') {
+    throw new Error(
+      `failed to parse "at" expression: the index argument must be a number`,
+    );
+  } else {
+    if (idx < 0) {
+      throw new Error(
+        `failed to parse "at" expression: the index argument must be a positive number`,
+      );
+    }
+  }
+
+  if (!Array.isArray(arr)) {
+    throw new Error(
+      `failed to parse "at" expression: the second argument must be an array`,
+    );
+  }
+
+  const array = new Array(arr.length);
+  for (let i = 0; i < array.length; i++) {
+    try {
+      const argType = typeof arr[i] === 'string' ? StringType : NumberType;
+      const arg = parse(arr[i], argType, context);
+      array[i] = arg;
+    } catch (err) {
+      throw new Error(`failed to parse "at" array item ${i}: ${err.message}`);
+    }
+  }
+
+  const index = parse(idx, NumberType, context);
+  return [index, ...array];
+}
+
+/**
+ * @type {ArgValidator}
+ */
+function withLengthArgs(encoded, returnType, context) {
+  const arrayOrString = encoded[1];
+
+  if (!Array.isArray(arrayOrString) && typeof arrayOrString !== 'string') {
+    throw new Error(
+      `failed to parse "length" expression: only an array or string is allowed`,
+    );
+  }
+
+  if (Array.isArray(arrayOrString)) {
+    const array = new Array(arrayOrString.length);
+    for (let i = 0; i < array.length; i++) {
+      try {
+        const argType =
+          typeof arrayOrString[i] === 'string' ? StringType : NumberType;
+        const arg = parse(arrayOrString[i], argType, context);
+        array[i] = arg;
+      } catch (err) {
+        throw new Error(
+          `failed to parse "length" array item ${i}: ${err.message}`,
+        );
+      }
+    }
+
+    return array;
+  }
+
+  return [parse(arrayOrString, StringType, context)];
 }
 
 /**
