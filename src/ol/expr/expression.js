@@ -989,24 +989,10 @@ function withAtArgs(encoded, returnType, context) {
     );
   }
 
-  const arrayType = typeof arr[0];
-  for (let i = 0; i < arr.length; i++) {
-    if (!['string', 'number'].includes(typeof arr[i])) {
-      throw new Error(
-        `failed to parse "at" expression: the array item ${i} must be string or number type`,
-      );
-    }
-    if (typeof arr[i] !== arrayType) {
-      throw new Error(
-        `failed to parse "at" expression: all items in array must be the same type`,
-      );
-    }
-  }
-
   const array = new Array(arr.length);
   for (let i = 0; i < array.length; i++) {
     try {
-      const argType = arrayType === 'string' ? StringType : NumberType;
+      const argType = typeof arr[i] === 'string' ? StringType : NumberType;
       const arg = parse(arr[i], argType, context);
       array[i] = arg;
     } catch (err) {

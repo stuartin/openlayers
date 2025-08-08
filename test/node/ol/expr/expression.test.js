@@ -500,18 +500,6 @@ describe('ol/expr/expression.js', () => {
         expression: ['at', 3, ['one', 'two']],
         error: 'failed to parse "at" expression: the index value is out bounds',
       },
-      {
-        name: 'array must be string or number (at)',
-        expression: ['at', 2, ['one', 'two', () => undefined]],
-        error:
-          'failed to parse "at" expression: the array item 2 must be string or number type',
-      },
-      {
-        name: 'array must be of the same type (at)',
-        expression: ['at', 2, ['one', 'two', 3]],
-        error:
-          'failed to parse "at" expression: all items in array must be the same type',
-      },
     ];
 
     for (const {name, expression, error, context} of cases) {
