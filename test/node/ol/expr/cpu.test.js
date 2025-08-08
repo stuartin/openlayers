@@ -808,7 +808,6 @@ describe('ol/expr/cpu.js', () => {
         expected: false,
       },
       {
-<<<<<<< HEAD
         name: 'at (valid)',
         type: StringType,
         expression: ['at', 0, ['one', 'two', 'three']],
@@ -824,7 +823,8 @@ describe('ol/expr/cpu.js', () => {
         type: StringType,
         expression: ['at', 1, ['one', ['get', 'text'], 'three']],
         expected: 'needle',
-=======
+      },
+      {
         name: 'regex (valid)',
         type: StringType,
         expression: ['regex', 'hello world', '^hello'],
@@ -835,7 +835,6 @@ describe('ol/expr/cpu.js', () => {
         type: StringType,
         expression: ['regex', 'hello world', '^world'],
         expected: [],
->>>>>>> main
       },
     ];
 
