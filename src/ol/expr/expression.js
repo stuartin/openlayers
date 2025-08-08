@@ -124,8 +124,9 @@ import {toSize} from '../size.js';
  *
  * * String operators:
  *   * `['concat', value1, ...valueN]` `concat` any number of strings together into a single string.
- *   * `['regex', value, regex, index]` performs a regex match against the `value` and returns the match at `index`.
- *     `\` characters must be escaped, for example: `['regex', '123', '^\\d+', 0]` would result int `123`
+ *   * `['regex', value, regex]` performs a regex match against the `value` and returns the matches as an array.
+ *     `\` characters in regex must be escaped, for example: `['regex', '123', '^\\d+']` would result in `['123']`,
+ *     if no result is gound, an empty array is returned.
  *
  * Values can either be literals or another operator, as they will be evaluated recursively.
  * Literal values can be of the following types:
@@ -604,8 +605,11 @@ const parsers = {
     hasArgsCount(1, 1),
     withArgsOfType(BooleanType | NumberType | StringType | ColorType),
   ),
-  [Ops.Regex]: createCallExpressionParser(hasArgsCount(3, 3), withRegexArgs),
   [Ops.At]: createCallExpressionParser(hasArgsCount(2, 2), withAtArgs),
+  [Ops.Regex]: createCallExpressionParser(
+    hasArgsCount(2, 2),
+    withArgsOfType(StringType),
+  ),
 };
 
 /**
@@ -1038,38 +1042,6 @@ function withPaletteArgs(encoded, returnType, context) {
     parsedColors[i] = color;
   }
   return [index, ...parsedColors];
-}
-
-/**
- * @type {ArgValidator}
- */
-function withRegexArgs(encoded, returnType, context) {
-  let input, regex, index;
-  try {
-    input = parse(encoded[1], StringType, context);
-  } catch (err) {
-    throw new Error(
-      `failed to parse arg 1 in regex expression: ${err.message}`,
-    );
-  }
-
-  try {
-    regex = parse(encoded[2], StringType, context);
-  } catch (err) {
-    throw new Error(
-      `failed to parse arg 2 in regex expression: ${err.message}`,
-    );
-  }
-
-  try {
-    index = parse(encoded[3], NumberType, context);
-  } catch (err) {
-    throw new Error(
-      `failed to parse arg 3 in regex expression: ${err.message}`,
-    );
-  }
-
-  return [input, regex, index];
 }
 
 /**

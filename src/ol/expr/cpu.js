@@ -426,11 +426,9 @@ function compileStringExpression(expression, context) {
     case Ops.Regex: {
       return (context) => {
         const value = args[0](context);
-        const regex = new RegExp(args[1](context));
-        const index = args[2](context);
+        const regex = new RegExp(args[1](context), 'g');
 
-        const result = value.match(regex);
-        return result ? result[index] : '';
+        return value.match(regex) ?? [];
       };
     }
 
