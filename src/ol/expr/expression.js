@@ -122,6 +122,12 @@ import {toSize} from '../size.js';
  *     If the input is a number, it is converted to a string as specified by the "NumberToString" algorithm of the ECMAScript
  *     Language Specification. If the input is a color, it is converted to a string of the form "rgba(r,g,b,a)". (Canvas only)
  *
+ * * String operators:
+ *   * `['concat', value1, ...valueN]` `concat` any number of strings together into a single string.
+ *   * `['regex', value, regex]` performs a regex match against the `value` and returns the matches as an array.
+ *     `\` characters in regex must be escaped, for example: `['regex', '123', '^\\d+']` would result in `['123']`,
+ *     if no result is gound, an empty array is returned.
+ *
  * Values can either be literals or another operator, as they will be evaluated recursively.
  * Literal values can be of the following types:
  * * `boolean`
@@ -424,6 +430,7 @@ export const Ops = {
   Palette: 'palette',
   ToString: 'to-string',
   Has: 'has',
+  Regex: 'regex',
 };
 
 /**
@@ -596,6 +603,10 @@ const parsers = {
   [Ops.ToString]: createCallExpressionParser(
     hasArgsCount(1, 1),
     withArgsOfType(BooleanType | NumberType | StringType | ColorType),
+  ),
+  [Ops.Regex]: createCallExpressionParser(
+    hasArgsCount(2, 2),
+    withArgsOfType(StringType),
   ),
 };
 

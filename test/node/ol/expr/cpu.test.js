@@ -807,6 +807,18 @@ describe('ol/expr/cpu.js', () => {
         expression: ['has', 'property', 0, 'foo'],
         expected: false,
       },
+      {
+        name: 'regex (valid)',
+        type: StringType,
+        expression: ['regex', 'hello world', '^hello'],
+        expected: ['hello'],
+      },
+      {
+        name: 'regex (no match)',
+        type: StringType,
+        expression: ['regex', 'hello world', '^world'],
+        expected: [],
+      },
     ];
 
     for (const c of cases) {
