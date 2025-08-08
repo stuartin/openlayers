@@ -807,6 +807,18 @@ describe('ol/expr/cpu.js', () => {
         expression: ['has', 'property', 0, 'foo'],
         expected: false,
       },
+      {
+        name: 'at (valid)',
+        type: StringType,
+        expression: ['at', 0, ['one', 'two', 'three']],
+        expected: 'one',
+      },
+      {
+        name: 'at (invalid)',
+        type: StringType,
+        expression: ['at', 4, ['one', 'two', 'three']],
+        expected: 'one',
+      },
     ];
 
     for (const c of cases) {

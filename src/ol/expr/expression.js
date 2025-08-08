@@ -430,6 +430,7 @@ export const Ops = {
   ToString: 'to-string',
   Has: 'has',
   Regex: 'regex',
+  At: 'at',
 };
 
 /**
@@ -604,6 +605,7 @@ const parsers = {
     withArgsOfType(BooleanType | NumberType | StringType | ColorType),
   ),
   [Ops.Regex]: createCallExpressionParser(hasArgsCount(3, 3), withRegexArgs),
+  [Ops.At]: createCallExpressionParser(hasArgsCount(2, 2), withAtArgs),
 };
 
 /**
@@ -950,6 +952,30 @@ function withInArgs(encoded, returnType, context) {
 
   const needle = parse(encoded[1], needleType, context);
   return [needle, ...args];
+}
+
+/**
+ * @type {ArgValidator}
+ */
+function withAtArgs(encoded, returnType, context) {
+  let index, array;
+  try {
+    index = parse(encoded[3], NumberType, context);
+  } catch (err) {
+    throw new Error(
+      `failed to parse arg 3 in regex expression: ${err.message}`,
+    );
+  }
+
+  try {
+    array = parse(encoded[2], StringArrayType, context);
+  } catch (err) {
+    throw new Error(
+      `failed to parse arg 2 in regex expression: ${err.message}`,
+    );
+  }
+
+  return [index, array];
 }
 
 /**

@@ -175,6 +175,9 @@ function compileExpression(expression, context) {
     case Ops.ToString: {
       return compileConvertExpression(expression, context);
     }
+    case Ops.At: {
+      return compileLookupExpression(expression, context);
+    }
     default: {
       throw new Error(`Unsupported operator ${operator}`);
     }
@@ -371,6 +374,35 @@ function compileLogicalExpression(expression, context) {
     }
     default: {
       throw new Error(`Unsupported logical operator ${op}`);
+    }
+  }
+}
+
+/**
+ * @param {import('./expression.js').CallExpression} expression The call expression.
+ * @param {import('./expression.js').ParsingContext} context The parsing context.
+ * @return {StringEvaluator} The evaluator function.
+ */
+function compileLookupExpression(expression, context) {
+  const op = expression.operator;
+  const length = expression.args.length;
+
+  const args = new Array(length);
+  for (let i = 0; i < length; ++i) {
+    args[i] = compileExpression(expression.args[i], context);
+  }
+  switch (op) {
+    case Ops.At: {
+      return (context) => {
+        const index = args[0](context);
+        const array = args[1](context);
+
+        return array[index];
+      };
+    }
+
+    default: {
+      throw new Error(`Unsupported lookup operator ${op}`);
     }
   }
 }
