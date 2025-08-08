@@ -471,6 +471,47 @@ describe('ol/expr/expression.js', () => {
         expression: ['palette', ['band', 2], 'red'],
         error: 'the second argument of palette must be an array',
       },
+      {
+        name: 'index must be number (at)',
+        expression: ['at', 'one', ['one', 'two', 'three']],
+        error:
+          'failed to parse "at" expression: the index argument must be a number',
+      },
+      {
+        name: 'index must be positive number (at)',
+        expression: ['at', -1, ['one', 'two', 'three']],
+        error:
+          'failed to parse "at" expression: the index argument must be a positive number',
+      },
+      {
+        name: 'second argument must be an array (at)',
+        expression: ['at', 0, 'one'],
+        error:
+          'failed to parse "at" expression: the second argument must be an array',
+      },
+      {
+        name: 'second argument must have one item (at)',
+        expression: ['at', 0, []],
+        error:
+          'failed to parse "at" expression: the array must contain at least 1 value',
+      },
+      {
+        name: 'index argument must be in bounds (at)',
+        expression: ['at', 3, ['one', 'two']],
+        error: 'failed to parse "at" expression: the index value is out bounds',
+      },
+      {
+        name: 'array must be string or number (at)',
+        expression: ['at', 2, ['one', 'two', () => undefined]],
+        error:
+          'failed to parse "at" expression: the array item 2 must be string or number type',
+      },
+      {
+        name: 'array must be of the same type (at)',
+        expression: ['at', 2, ['one', 'two', 3]],
+        error:
+          'failed to parse "at" expression: all items in array must be the same type',
+      },
     ];
 
     for (const {name, expression, error, context} of cases) {

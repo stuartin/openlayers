@@ -395,9 +395,7 @@ function compileLookupExpression(expression, context) {
     case Ops.At: {
       return (context) => {
         const index = args[0](context);
-        const array = args[1](context);
-
-        return array[index];
+        return args[index + 1](context);
       };
     }
 

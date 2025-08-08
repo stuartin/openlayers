@@ -958,24 +958,64 @@ function withInArgs(encoded, returnType, context) {
  * @type {ArgValidator}
  */
 function withAtArgs(encoded, returnType, context) {
-  let index, array;
-  try {
-    index = parse(encoded[3], NumberType, context);
-  } catch (err) {
+  const idx = encoded[1];
+  const arr = encoded[2];
+
+  if (typeof idx !== 'number') {
     throw new Error(
-      `failed to parse arg 3 in regex expression: ${err.message}`,
+      `failed to parse "at" expression: the index argument must be a number`,
+    );
+  } else {
+    if (idx < 0) {
+      throw new Error(
+        `failed to parse "at" expression: the index argument must be a positive number`,
+      );
+    }
+  }
+
+  if (!Array.isArray(arr)) {
+    throw new Error(
+      `failed to parse "at" expression: the second argument must be an array`,
+    );
+  }
+  if (arr.length === 0) {
+    throw new Error(
+      `failed to parse "at" expression: the array must contain at least 1 value`,
+    );
+  }
+  if (idx > arr.length - 1) {
+    throw new Error(
+      `failed to parse "at" expression: the index value is out bounds`,
     );
   }
 
-  try {
-    array = parse(encoded[2], StringArrayType, context);
-  } catch (err) {
-    throw new Error(
-      `failed to parse arg 2 in regex expression: ${err.message}`,
-    );
+  const arrayType = typeof arr[0];
+  for (let i = 0; i < arr.length; i++) {
+    if (!['string', 'number'].includes(typeof arr[i])) {
+      throw new Error(
+        `failed to parse "at" expression: the array item ${i} must be string or number type`,
+      );
+    }
+    if (typeof arr[i] !== arrayType) {
+      throw new Error(
+        `failed to parse "at" expression: all items in array must be the same type`,
+      );
+    }
   }
 
-  return [index, array];
+  const array = new Array(arr.length);
+  for (let i = 0; i < array.length; i++) {
+    try {
+      const argType = arrayType === 'string' ? StringType : NumberType;
+      const arg = parse(arr[i], argType, context);
+      array[i] = arg;
+    } catch (err) {
+      throw new Error(`failed to parse "at" array item ${i}: ${err.message}`);
+    }
+  }
+
+  const index = parse(idx, NumberType, context);
+  return [index, ...array];
 }
 
 /**
